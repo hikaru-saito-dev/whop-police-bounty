@@ -97,14 +97,14 @@ function HomeContent() {
         <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 4 }}>
           <Tabs value={tabValue} onChange={(_, newValue) => setTabValue(newValue)}>
             <Tab icon={<Report />} iconPosition="start" label="Report Scammer" />
-            {role === 'admin' && (
+            {(role === 'owner' || role === 'admin') && (
               <Tab icon={<AdminPanelSettings />} iconPosition="start" label="Review Reports" />
             )}
           </Tabs>
         </Box>
 
         {tabValue === 0 && <ReportForm companyId={finalCompanyId} />}
-        {tabValue === 1 && role === 'admin' && <AdminReviewPage companyId={finalCompanyId} />}
+        {tabValue === 1 && (role === 'owner' || role === 'admin') && <AdminReviewPage companyId={finalCompanyId} />}
       </Container>
     </Box>
   );

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyUserFromRequest, isTeamMember, banUserFromCompany, getWhopClient } from '@/lib/whop';
+import { verifyUserFromRequest, isCompanyOwner, isTeamMember, banUserFromCompany, getWhopClient } from '@/lib/whop';
 import {
   getReportById,
   updateReportStatus,
@@ -38,10 +38,11 @@ export async function PATCH(
       );
     }
 
-    // Check if user is team member
+    // Check if user is owner or team member (admin)
+    const isOwner = await isCompanyOwner(userId, companyId);
     const isAdmin = await isTeamMember(userId, companyId);
-    if (!isAdmin) {
-      return NextResponse.json({ error: 'Forbidden: Team members only' }, { status: 403 });
+    if (!isOwner && !isAdmin) {
+      return NextResponse.json({ error: 'Forbidden: Owners and team members only' }, { status: 403 });
     }
 
     // Get report from MongoDB

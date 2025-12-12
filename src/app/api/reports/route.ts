@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyUserFromRequest, isTeamMember, getWhopClient } from '@/lib/whop';
+import { verifyUserFromRequest, isCompanyOwner, isTeamMember, getWhopClient } from '@/lib/whop';
 import {
   createReport,
   getReportsByCompany,
@@ -21,10 +21,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'company_id is required' }, { status: 400 });
     }
 
-    // Check if user is team member
+    // Check if user is owner or team member (admin)
+    const isOwner = await isCompanyOwner(userId, companyId);
     const isAdmin = await isTeamMember(userId, companyId);
-    if (!isAdmin) {
-      return NextResponse.json({ error: 'Forbidden: Team members only' }, { status: 403 });
+    if (!isOwner && !isAdmin) {
+      return NextResponse.json({ error: 'Forbidden: Owners and team members only' }, { status: 403 });
     }
 
     // Get reports from MongoDB

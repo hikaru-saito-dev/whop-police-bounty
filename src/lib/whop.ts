@@ -161,6 +161,23 @@ export async function verifyUserFromHeaders(
   }
 }
 
+/**
+ * Check if user is the company owner
+ */
+export async function isCompanyOwner(userId: string, companyId: string): Promise<boolean> {
+  try {
+    const client = getWhopClient();
+    const company = await client.companies.retrieve(companyId);
+    return company.owner_user?.id === userId;
+  } catch (error) {
+    console.error('Error checking company ownership:', error);
+    return false;
+  }
+}
+
+/**
+ * Check if user is an authorized user (team member/admin) of the company
+ */
 export async function isTeamMember(userId: string, companyId: string): Promise<boolean> {
   try {
     const client = getWhopClient();

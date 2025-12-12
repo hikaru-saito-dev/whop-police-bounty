@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyUserFromHeaders, isTeamMember } from '@/lib/whop';
+import { verifyUserFromHeaders, isCompanyOwner, isTeamMember } from '@/lib/whop';
 
 export const runtime = 'nodejs';
 
@@ -32,10 +32,19 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Check if user is team member (admin) using ONLY @whop/sdk
-    // Team members are authorized users of the company
+    // Check user role using ONLY @whop/sdk
+    // Priority: owner > admin (authorized user) > member
+    const isOwner = await isCompanyOwner(userId, companyId);
     const isAdmin = await isTeamMember(userId, companyId);
-    const role: 'admin' | 'member' | 'none' = isAdmin ? 'admin' : 'member';
+    
+    let role: 'owner' | 'admin' | 'member' | 'none';
+    if (isOwner) {
+      role = 'owner';
+    } else if (isAdmin) {
+      role = 'admin';
+    } else {
+      role = 'member';
+    }
     
     // All authenticated users with companyId are authorized (can use the app)
     const isAuthorized = true;

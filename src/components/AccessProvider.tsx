@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
-type AccessRole = 'admin' | 'member' | 'none';
+type AccessRole = 'owner' | 'admin' | 'member' | 'none';
 
 type AccessContextValue = {
   role: AccessRole;
@@ -70,7 +70,7 @@ async function fetchAccessRole(experienceId?: string | null): Promise<{
     const userId = data.userId || null;
     const companyId = data.companyId || null;
     
-    if (role === 'admin' || role === 'member' || role === 'none') {
+    if (role === 'owner' || role === 'admin' || role === 'member' || role === 'none') {
       return { role, isAuthorized, userId, companyId };
     }
 
