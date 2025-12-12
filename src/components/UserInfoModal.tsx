@@ -8,15 +8,12 @@ import {
   Typography,
   Avatar,
   IconButton,
-  Button,
   Divider,
-  TextField,
   Paper,
-  Chip,
   CircularProgress,
   Alert,
 } from '@mui/material';
-import { Close, Block, VolumeOff, Edit, ContentCopy, CheckCircle } from '@mui/icons-material';
+import { Close, ContentCopy, CheckCircle } from '@mui/icons-material';
 
 interface UserInfo {
   id: string;
@@ -29,6 +26,7 @@ interface UserInfo {
   location: string | null;
   discordId: string | null;
   discord: string | null;
+  joinedAt: string;
 }
 
 interface UserInfoModalProps {
@@ -42,7 +40,6 @@ export default function UserInfoModal({ open, onClose, username }: UserInfoModal
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
-  const [note, setNote] = useState('');
 
   useEffect(() => {
     if (open && username) {
@@ -50,7 +47,6 @@ export default function UserInfoModal({ open, onClose, username }: UserInfoModal
     } else {
       setUserInfo(null);
       setError(null);
-      setNote('');
     }
   }, [open, username]);
 
@@ -98,9 +94,9 @@ export default function UserInfoModal({ open, onClose, username }: UserInfoModal
     const diffTime = Math.abs(now.getTime() - date.getTime());
     const diffMonths = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 30));
     
-    if (diffMonths === 0) return 'Joined this month';
-    if (diffMonths === 1) return 'Joined 1 month ago';
-    return `Joined ${month} ${year}`;
+    if (diffMonths === 0) return 'Created this month';
+    if (diffMonths === 1) return 'Created 1 month ago';
+    return `Created ${month} ${year}`;
   };
 
   const AdminDetailRow = ({ label, value }: { label: string; value: string | null }) => {
@@ -139,7 +135,7 @@ export default function UserInfoModal({ open, onClose, username }: UserInfoModal
       fullWidth
       PaperProps={{
         sx: {
-          bgcolor: 'background.paper',
+          bgcolor: 'background.default',
           borderRadius: 2,
         },
       }}
@@ -160,10 +156,10 @@ export default function UserInfoModal({ open, onClose, username }: UserInfoModal
               sx={{
                 width: '100%',
                 height: 200,
-                bgcolor: 'primary.main',
+                bgcolor: 'background.paper',
                 backgroundImage: userInfo.bannerImage
                   ? `url(${userInfo.bannerImage})`
-                  : 'linear-gradient(135deg, #FA4616 0%, #E86644 100%)',
+                  : 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)',
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 position: 'relative',
@@ -194,7 +190,7 @@ export default function UserInfoModal({ open, onClose, username }: UserInfoModal
                   width: 120,
                   height: 120,
                   border: 4,
-                  borderColor: 'background.paper',
+                  borderColor: 'background.default',
                   mb: 2,
                 }}
               >
@@ -211,49 +207,9 @@ export default function UserInfoModal({ open, onClose, username }: UserInfoModal
               <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
                 {formatDate(userInfo.createdAt)}
               </Typography>
-
-              <Divider sx={{ my: 3 }} />
-
-              {/* Action Buttons */}
-              <Box sx={{ display: 'flex', gap: 1, mb: 3 }}>
-                <Button
-                  variant="outlined"
-                  startIcon={<VolumeOff />}
-                  size="small"
-                  disabled
-                >
-                  Mute
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="error"
-                  startIcon={<Block />}
-                  size="small"
-                  disabled
-                >
-                  Ban
-                </Button>
-                <Button
-                  variant="outlined"
-                  startIcon={<Edit />}
-                  size="small"
-                  disabled
-                >
-                  Add note
-                </Button>
-              </Box>
-
-              {/* Note Field */}
-              <TextField
-                fullWidth
-                multiline
-                rows={3}
-                placeholder="Add a note about this user..."
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                sx={{ mb: 3 }}
-                disabled
-              />
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                {formatDate(userInfo.joinedAt)}
+              </Typography>
 
               <Divider sx={{ my: 3 }} />
 
