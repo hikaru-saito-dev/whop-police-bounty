@@ -39,13 +39,13 @@ export async function GET(
       // This gives us both user info and member-specific data in one call
       if (companyId) {
         try {
-          const members = client.members.list({
+          const members = await client.members.list({
             company_id: companyId,
             query: cleanUsername, // Search by username (also supports name and email)
             first: 1, // Only need the first match
           });
 
-          for await (const member of members) {
+          for await (const member of members.data) {
             if (member.user && (member.user.username === cleanUsername || member.user.id === cleanUsername)) {
               // Found as member - use member.user for user data and member for additional info
               userData = {
@@ -102,13 +102,13 @@ export async function GET(
         // Try to get email from members if we have companyId
         if (companyId) {
           try {
-            const members = client.members.list({
+            const members = await client.members.list({
               company_id: companyId,
               user_ids: [user.id],
               first: 1,
             });
 
-            for await (const member of members) {
+            for await (const member of members.data) {
               if (member.user?.id === user.id) {
                 userData.email = member.user.email || null;
                 memberInfo = {

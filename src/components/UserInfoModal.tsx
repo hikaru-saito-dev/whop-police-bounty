@@ -94,9 +94,9 @@ export default function UserInfoModal({ open, onClose, username }: UserInfoModal
     const diffTime = Math.abs(now.getTime() - date.getTime());
     const diffMonths = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 30));
     
-    if (diffMonths === 0) return 'Created this month';
-    if (diffMonths === 1) return 'Created 1 month ago';
-    return `Created ${month} ${year}`;
+    if (diffMonths === 0) return 'this month';
+    if (diffMonths === 1) return '1 month ago';
+    return `${month} ${year}`;
   };
 
   const AdminDetailRow = ({ label, value }: { label: string; value: string | null }) => {
@@ -205,12 +205,12 @@ export default function UserInfoModal({ open, onClose, username }: UserInfoModal
                 @{userInfo.username}
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                {formatDate(userInfo.createdAt)}
+                Created: {formatDate(userInfo.createdAt)}
               </Typography>
               {
                 userInfo.joinedAt && (
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                    {formatDate(userInfo.joinedAt)}
+                    Joined: {formatDate(userInfo.joinedAt)}
                   </Typography>
                 )
               }
