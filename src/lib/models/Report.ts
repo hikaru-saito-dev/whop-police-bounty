@@ -1,4 +1,4 @@
-import clientPromise from '../mongodb';
+import getClientPromise from '../mongodb';
 import { ObjectId } from 'mongodb';
 
 export interface Report {
@@ -15,20 +15,26 @@ export interface Report {
   reviewedBy?: string;
 }
 
+// MongoDB document type (with ObjectId)
+interface ReportDocument extends Omit<Report, '_id'> {
+  _id?: ObjectId;
+}
+
 export async function getReportsCollection() {
+  const clientPromise = getClientPromise();
   const client = await clientPromise;
   const db = client.db();
-  return db.collection<Report>('reports');
+  return db.collection<ReportDocument>('reports');
 }
 
 export async function createReport(report: Omit<Report, '_id' | 'createdAt'>): Promise<Report> {
   const collection = await getReportsCollection();
-  const newReport: Omit<Report, '_id'> = {
+  const newReport: Omit<ReportDocument, '_id'> = {
     ...report,
     createdAt: new Date().toISOString(),
   };
-  const result = await collection.insertOne(newReport as any);
-  return { ...newReport, _id: result.insertedId.toString() };
+  const result = await collection.insertOne(newReport);
+  return { ...report, _id: result.insertedId.toString(), createdAt: newReport.createdAt };
 }
 
 export async function getReportsByCompany(companyId: string): Promise<Report[]> {
@@ -43,8 +49,9 @@ export async function getReportsByCompany(companyId: string): Promise<Report[]> 
 export async function getReportById(id: string, companyId: string): Promise<Report | null> {
   const collection = await getReportsCollection();
   try {
+    const objectId = new ObjectId(id);
     const report = await collection.findOne({
-      _id: new ObjectId(id),
+      _id: objectId,
       companyId,
     });
     if (!report) return null;
@@ -62,8 +69,9 @@ export async function updateReportStatus(
 ): Promise<Report | null> {
   const collection = await getReportsCollection();
   try {
+    const objectId = new ObjectId(id);
     const result = await collection.findOneAndUpdate(
-      { _id: new ObjectId(id), companyId },
+      { _id: objectId, companyId },
       {
         $set: {
           status,

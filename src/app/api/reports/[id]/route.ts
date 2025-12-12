@@ -8,9 +8,10 @@ import {
 // PATCH - Update report status (approve/deny)
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const authInfo = await verifyUserFromRequest(request);
     if (!authInfo) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -44,7 +45,7 @@ export async function PATCH(
     }
 
     // Get report from MongoDB
-    const report = await getReportById(params.id, companyId);
+    const report = await getReportById(id, companyId);
     if (!report) {
       return NextResponse.json({ error: 'Report not found' }, { status: 404 });
     }
@@ -68,7 +69,7 @@ export async function PATCH(
       }
 
       const updatedReport = await updateReportStatus(
-        params.id,
+        id,
         companyId,
         'approved',
         userId
@@ -77,7 +78,7 @@ export async function PATCH(
       return NextResponse.json({ report: updatedReport });
     } else {
       const updatedReport = await updateReportStatus(
-        params.id,
+        id,
         companyId,
         'denied',
         userId
