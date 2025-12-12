@@ -3,12 +3,13 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Box, Container, AppBar, Toolbar, Typography, Button, Tabs, Tab } from '@mui/material';
-import { Report, AdminPanelSettings } from '@mui/icons-material';
+import { Report, AdminPanelSettings, History } from '@mui/icons-material';
 import Image from 'next/image';
 import { useTheme } from 'next-themes';
 import { useAccess, setExperienceId } from '@/components/AccessProvider';
 import ReportForm from '@/components/ReportForm';
 import AdminReviewPage from '@/components/AdminReviewPage';
+import MyReports from '@/components/MyReports';
 
 function HomeContent() {
   const searchParams = useSearchParams();
@@ -97,6 +98,7 @@ function HomeContent() {
         <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 4 }}>
           <Tabs value={tabValue} onChange={(_, newValue) => setTabValue(newValue)}>
             <Tab icon={<Report />} iconPosition="start" label="Report Scammer" />
+            <Tab icon={<History />} iconPosition="start" label="My Reports" />
             {(role === 'owner' || role === 'admin') && (
               <Tab icon={<AdminPanelSettings />} iconPosition="start" label="Review Reports" />
             )}
@@ -104,7 +106,10 @@ function HomeContent() {
         </Box>
 
         {tabValue === 0 && <ReportForm companyId={finalCompanyId} />}
-        {tabValue === 1 && (role === 'owner' || role === 'admin') && <AdminReviewPage companyId={finalCompanyId} />}
+        {tabValue === 1 && <MyReports companyId={finalCompanyId} />}
+        {tabValue === 2 && (role === 'owner' || role === 'admin') && (
+          <AdminReviewPage companyId={finalCompanyId} />
+        )}
       </Container>
     </Box>
   );

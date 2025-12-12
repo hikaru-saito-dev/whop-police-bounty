@@ -46,6 +46,21 @@ export async function getReportsByCompany(companyId: string): Promise<Report[]> 
   })) as Report[];
 }
 
+export async function getReportsByReporter(
+  reporterUserId: string,
+  companyId: string
+): Promise<Report[]> {
+  const collection = await getReportsCollection();
+  const reports = await collection
+    .find({ reporterUserId, companyId })
+    .sort({ createdAt: -1 })
+    .toArray();
+  return reports.map((r) => ({
+    ...r,
+    _id: r._id?.toString(),
+  })) as Report[];
+}
+
 export async function getReportById(id: string, companyId: string): Promise<Report | null> {
   const collection = await getReportsCollection();
   try {

@@ -19,6 +19,7 @@ import {
 } from '@mui/material';
 import { CheckCircle, Cancel, Visibility } from '@mui/icons-material';
 import { Report } from '@/lib/models/Report';
+import UserInfoModal from '@/components/UserInfoModal';
 
 interface AdminReviewPageProps {
   companyId: string;
@@ -31,6 +32,8 @@ export default function AdminReviewPage({ companyId }: AdminReviewPageProps) {
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [processing, setProcessing] = useState<string | null>(null);
+  const [userModalOpen, setUserModalOpen] = useState(false);
+  const [selectedUsername, setSelectedUsername] = useState<string>('');
 
   useEffect(() => {
     fetchReports();
@@ -175,7 +178,18 @@ export default function AdminReviewPage({ companyId }: AdminReviewPageProps) {
                 <Card elevation={2}>
                   <CardContent>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                      <Typography variant="h6" fontWeight="bold">
+                      <Typography
+                        variant="h6"
+                        fontWeight="bold"
+                        sx={{
+                          cursor: 'pointer',
+                          '&:hover': { textDecoration: 'underline', color: 'primary.main' },
+                        }}
+                        onClick={() => {
+                          setSelectedUsername(report.reportedUsername);
+                          setUserModalOpen(true);
+                        }}
+                      >
                         @{report.reportedUsername}
                       </Typography>
                       <Chip
@@ -185,7 +199,20 @@ export default function AdminReviewPage({ companyId }: AdminReviewPageProps) {
                       />
                     </Box>
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                      Reported by: @{report.reporterUsername}
+                      Reported by:{' '}
+                      <Typography
+                        component="span"
+                        sx={{
+                          cursor: 'pointer',
+                          '&:hover': { textDecoration: 'underline', color: 'primary.main' },
+                        }}
+                        onClick={() => {
+                          setSelectedUsername(report.reporterUsername);
+                          setUserModalOpen(true);
+                        }}
+                      >
+                        @{report.reporterUsername}
+                      </Typography>
                     </Typography>
                     <Typography variant="body1" sx={{ mb: 2 }}>
                       {report.description}
@@ -250,7 +277,19 @@ export default function AdminReviewPage({ companyId }: AdminReviewPageProps) {
                 <Card elevation={1}>
                   <CardContent>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                      <Typography variant="h6">@{report.reportedUsername}</Typography>
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          cursor: 'pointer',
+                          '&:hover': { textDecoration: 'underline', color: 'primary.main' },
+                        }}
+                        onClick={() => {
+                          setSelectedUsername(report.reportedUsername);
+                          setUserModalOpen(true);
+                        }}
+                      >
+                        @{report.reportedUsername}
+                      </Typography>
                       <Chip
                         label={report.status}
                         color={getStatusColor(report.status) as any}
@@ -258,7 +297,20 @@ export default function AdminReviewPage({ companyId }: AdminReviewPageProps) {
                       />
                     </Box>
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                      Reported by: @{report.reporterUsername}
+                      Reported by:{' '}
+                      <Typography
+                        component="span"
+                        sx={{
+                          cursor: 'pointer',
+                          '&:hover': { textDecoration: 'underline', color: 'primary.main' },
+                        }}
+                        onClick={() => {
+                          setSelectedUsername(report.reporterUsername);
+                          setUserModalOpen(true);
+                        }}
+                      >
+                        @{report.reporterUsername}
+                      </Typography>
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       Reviewed: {report.reviewedAt ? new Date(report.reviewedAt).toLocaleString() : 'N/A'}
@@ -291,6 +343,12 @@ export default function AdminReviewPage({ companyId }: AdminReviewPageProps) {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <UserInfoModal
+        open={userModalOpen}
+        onClose={() => setUserModalOpen(false)}
+        username={selectedUsername}
+      />
     </Box>
   );
 }
