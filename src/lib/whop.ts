@@ -6,7 +6,7 @@ let whopClient: Whop | null = null;
 export function getWhopClient(): Whop {
   if (!whopClient) {
     const apiKey = process.env.WHOP_API_KEY;
-    const appID = process.env.WHOP_APP_ID;
+    const appID = process.env.NEXT_PUBLIC_WHOP_APP_ID;
 
     if (!apiKey) {
       throw new Error('WHOP_API_KEY environment variable is not set');

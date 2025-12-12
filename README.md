@@ -27,7 +27,7 @@ A Next.js application for reporting scammers on the Whop platform. Built with Ma
    Create a `.env.local` file in the root directory:
    ```env
    WHOP_API_KEY=your_whop_api_key_here
-   WHOP_APP_ID=your_whop_app_id_here
+   NEXT_PUBLIC_WHOP_APP_ID=your_whop_app_id_here
    MONGODB_URI=mongodb://localhost:27017/whop-bounty
    ```
 

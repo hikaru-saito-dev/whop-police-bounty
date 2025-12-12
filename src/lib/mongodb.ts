@@ -1,12 +1,16 @@
-import { MongoClient } from 'mongodb';
+import { MongoClient, MongoClientOptions } from 'mongodb';
 
-const options = {};
+
 
 let client: MongoClient;
 let clientPromise: Promise<MongoClient>;
 
 function getClientPromise(): Promise<MongoClient> {
   const uri = process.env.MONGODB_URI;
+  const dbName = process.env.MONGODB_DB_NAME;
+  const options = {
+    dbName: dbName,
+  };
   
   if (!uri) {
     throw new Error('Please add your Mongo URI to .env.local');
@@ -20,14 +24,14 @@ function getClientPromise(): Promise<MongoClient> {
     };
 
     if (!globalWithMongo._mongoClientPromise) {
-      client = new MongoClient(uri, options);
+      client = new MongoClient(uri, options as MongoClientOptions);
       globalWithMongo._mongoClientPromise = client.connect();
     }
     return globalWithMongo._mongoClientPromise;
   } else {
     // In production mode, it's best to not use a global variable.
     if (!clientPromise) {
-      client = new MongoClient(uri, options);
+      client = new MongoClient(uri, options as MongoClientOptions);
       clientPromise = client.connect();
     }
     return clientPromise;
