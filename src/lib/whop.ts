@@ -177,8 +177,12 @@ export async function isCompanyOwner(userId: string, companyId: string): Promise
 
 /**
  * Check if user is an authorized user (team member/admin) of the company
+ * Returns the role if found, null otherwise
  */
-export async function isTeamMember(userId: string, companyId: string): Promise<boolean> {
+export async function getAuthorizedUserRole(
+  userId: string,
+  companyId: string
+): Promise<string | null> {
   try {
     const client = getWhopClient();
     
@@ -189,15 +193,23 @@ export async function isTeamMember(userId: string, companyId: string): Promise<b
 
     for await (const authorizedUser of authorizedUsers) {
       if (authorizedUser.user?.id === userId) {
-        return true;
+        return authorizedUser.role || null;
       }
     }
 
-    return false;
+    return null;
   } catch (error) {
-    console.error('Error checking team membership:', error);
-    return false;
+    console.error('Error checking authorized user role:', error);
+    return null;
   }
+}
+
+/**
+ * Check if user is an authorized user (team member/admin) of the company
+ */
+export async function isTeamMember(userId: string, companyId: string): Promise<boolean> {
+  const role = await getAuthorizedUserRole(userId, companyId);
+  return role !== null;
 }
 
 export async function banUserFromCompany(

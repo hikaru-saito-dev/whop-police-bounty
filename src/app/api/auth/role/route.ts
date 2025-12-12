@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyUserFromHeaders, isCompanyOwner, isTeamMember } from '@/lib/whop';
+import { verifyUserFromHeaders, isCompanyOwner, getAuthorizedUserRole } from '@/lib/whop';
 
 export const runtime = 'nodejs';
 
@@ -33,16 +33,22 @@ export async function GET(request: NextRequest) {
     }
 
     // Check user role using ONLY @whop/sdk
-    // Priority: owner > admin (authorized user) > member
-    const isOwner = await isCompanyOwner(userId, companyId);
-    const isAdmin = await isTeamMember(userId, companyId);
+    // Priority: company owner > authorized user with owner role > authorized user (admin/moderator/etc) > member
+    const isCompanyOwnerUser = await isCompanyOwner(userId, companyId);
+    const authorizedUserRole = await getAuthorizedUserRole(userId, companyId);
     
     let role: 'owner' | 'admin' | 'member' | 'none';
-    if (isOwner) {
+    if (isCompanyOwnerUser) {
+      // User is the actual company owner
       role = 'owner';
-    } else if (isAdmin) {
+    } else if (authorizedUserRole === 'owner') {
+      // User has owner role in authorized users (co-owner)
+      role = 'owner';
+    } else if (authorizedUserRole) {
+      // User is an authorized user (admin, moderator, etc.)
       role = 'admin';
     } else {
+      // Regular member
       role = 'member';
     }
     
