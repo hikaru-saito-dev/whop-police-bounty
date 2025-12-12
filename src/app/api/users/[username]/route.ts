@@ -107,7 +107,7 @@ export async function GET(
                             first: 1,
                         });
 
-                        for await (const member of (await members).data) {
+                        for await (const member of members.data) {
                             if (member.user?.id === user.id) {
                                 userData.email = member.user.email || null;
                                 memberInfo = {
