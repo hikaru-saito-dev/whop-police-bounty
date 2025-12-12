@@ -1,66 +1,125 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+'use client';
+
+import { Suspense, useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { Box, Container, AppBar, Toolbar, Typography, Button, Tabs, Tab } from '@mui/material';
+import { Report, AdminPanelSettings } from '@mui/icons-material';
+import Image from 'next/image';
+import { useTheme } from 'next-themes';
+import { useAccess, setExperienceId } from '@/components/AccessProvider';
+import ReportForm from '@/components/ReportForm';
+import AdminReviewPage from '@/components/AdminReviewPage';
+
+function HomeContent() {
+  const searchParams = useSearchParams();
+  const experienceId = searchParams?.get('experience') || null;
+  const { isAuthorized, loading, role, companyId } = useAccess();
+  const [tabValue, setTabValue] = useState(0);
+  const { theme, setTheme } = useTheme();
+
+  // Set experienceId in AccessProvider when it's available from page.tsx
+  useEffect(() => {
+    if (experienceId) {
+      setExperienceId(experienceId);
+    }
+  }, [experienceId]);
+
+  // Use companyId from auth or query params
+  const finalCompanyId = companyId;
+
+  if (loading) {
+    return (
+      <Container>
+        <Box sx={{ textAlign: 'center', mt: 8 }}>
+          <Typography variant="h6">Loading...</Typography>
+        </Box>
+      </Container>
+    );
+  }
+
+  if (!isAuthorized) {
+    return (
+      <Container>
+        <Box sx={{ textAlign: 'center', mt: 8 }}>
+          <Typography variant="h5" color="error">
+            Unauthorized
+          </Typography>
+          <Typography variant="body1" sx={{ mt: 2 }}>
+            You must be authenticated to use this app.
+          </Typography>
+        </Box>
+      </Container>
+    );
+  }
+
+  if (!finalCompanyId) {
+    return (
+      <Container>
+        <Box sx={{ textAlign: 'center', mt: 8 }}>
+          <Typography variant="h5" color="error">
+            Missing company_id
+          </Typography>
+          <Typography variant="body1" sx={{ mt: 2 }}>
+            Please provide a company_id in the URL query parameters or ensure you're accessing through a Whop experience.
+          </Typography>
+        </Box>
+      </Container>
+    );
+  }
+
+  return (
+    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+      <AppBar position="static" elevation={0} sx={{ bgcolor: 'background.paper', borderBottom: 1, borderColor: 'divider' }}>
+        <Toolbar>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexGrow: 1 }}>
+            <Image
+              src={theme === 'dark' ? '/whop-assets/logos/whop-logo-white.png' : '/whop-assets/logos/whop-logo.png'}
+              alt="Whop Logo"
+              width={32}
+              height={32}
+              style={{ objectFit: 'contain' }}
+            />
+            <Typography variant="h6" component="div" sx={{ fontWeight: 700 }}>
+              Whop Bounty
+            </Typography>
+          </Box>
+          <Button
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            variant="outlined"
+            size="small"
+          >
+            {theme === 'dark' ? '☀️' : '🌙'}
+          </Button>
+        </Toolbar>
+      </AppBar>
+
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 4 }}>
+          <Tabs value={tabValue} onChange={(_, newValue) => setTabValue(newValue)}>
+            <Tab icon={<Report />} iconPosition="start" label="Report Scammer" />
+            {role === 'admin' && (
+              <Tab icon={<AdminPanelSettings />} iconPosition="start" label="Review Reports" />
+            )}
+          </Tabs>
+        </Box>
+
+        {tabValue === 0 && <ReportForm companyId={finalCompanyId} />}
+        {tabValue === 1 && role === 'admin' && <AdminReviewPage companyId={finalCompanyId} />}
+      </Container>
+    </Box>
+  );
+}
 
 export default function Home() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <Suspense fallback={
+      <Container maxWidth="lg" sx={{ py: 8 }}>
+        <Typography variant="h6" sx={{ textAlign: 'center' }}>
+          Loading...
+        </Typography>
+      </Container>
+    }>
+      <HomeContent />
+    </Suspense>
   );
 }
