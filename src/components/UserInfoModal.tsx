@@ -14,6 +14,7 @@ import {
   Alert,
 } from '@mui/material';
 import { Close, ContentCopy, CheckCircle } from '@mui/icons-material';
+import { useAccess } from './AccessProvider';
 
 interface UserInfo {
   id: string;
@@ -40,7 +41,7 @@ export default function UserInfoModal({ open, onClose, username }: UserInfoModal
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
-
+  const { companyId } = useAccess();
   useEffect(() => {
     if (open && username) {
       fetchUserInfo();
@@ -55,7 +56,7 @@ export default function UserInfoModal({ open, onClose, username }: UserInfoModal
       setLoading(true);
       setError(null);
       const cleanUsername = username.replace('@', '');
-      const response = await fetch(`/api/users/${cleanUsername}`);
+      const response = await fetch(`/api/users/${cleanUsername}?company_id=${companyId}`);
       
       if (!response.ok) {
         if (response.status === 404) {

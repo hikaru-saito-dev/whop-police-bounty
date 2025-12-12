@@ -11,8 +11,6 @@ export const runtime = 'nodejs';
 export async function GET(request: NextRequest) {
   try {
     const headers = await import('next/headers').then(m => m.headers());
-    const searchParams = request.nextUrl.searchParams;
-    const experienceId = searchParams.get('experience');
     
     // Verify user and get companyId (pass request.url so experienceId can be extracted)
     const authInfo = await verifyUserFromHeaders(headers, request.url);
@@ -22,7 +20,6 @@ export async function GET(request: NextRequest) {
     }
 
     const { userId, companyId } = authInfo;
-
     if (!companyId) {
       return NextResponse.json({ 
         role: 'none', 

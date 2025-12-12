@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyUserFromRequest, getWhopClient } from '@/lib/whop';
+import { getWhopClient } from '@/lib/whop';
 
 // GET - Fetch user information by username
 export async function GET(
@@ -7,14 +7,9 @@ export async function GET(
     { params }: { params: Promise<{ username: string }> }
 ) {
     try {
-        const authInfo = await verifyUserFromRequest(request);
-        if (!authInfo?.companyId) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
-
         const { username } = await params;
         const cleanUsername = username.replace('@', '');
-        const { companyId } = authInfo;
+        const companyId = request.nextUrl.searchParams.get('company_id');
 
         const client = getWhopClient();
 
