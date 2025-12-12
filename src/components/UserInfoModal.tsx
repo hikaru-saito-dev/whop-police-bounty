@@ -207,9 +207,13 @@ export default function UserInfoModal({ open, onClose, username }: UserInfoModal
               <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
                 {formatDate(userInfo.createdAt)}
               </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                {formatDate(userInfo.joinedAt)}
-              </Typography>
+              {
+                userInfo.joinedAt && (
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                    {formatDate(userInfo.joinedAt)}
+                  </Typography>
+                )
+              }
 
               <Divider sx={{ my: 3 }} />
 
