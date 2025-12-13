@@ -220,28 +220,71 @@ export async function banUserFromCompany(
     const client = getWhopClient();
     
     // Get all memberships for this user in the company
-    const memberships = await client.memberships.list({
+    const memberships = client.memberships.list({
       company_id: companyId,
       user_ids: [userId],
     });
 
     let canceled = false;
+    let totalMemberships = 0;
+    let canceledCount = 0;
+    let errorCount = 0;
+    let skippedCount = 0;
+    
     // Cancel all memberships to effectively ban the user
     for await (const membership of memberships) {
+      totalMemberships++;
+      
+      // Skip memberships that are already completed or canceled
+      // Only cancel active memberships (status: 'active', 'trialing', etc.)
+      const status = membership.status?.toLowerCase();
+      if (status === 'completed' || status === 'canceled' || status === 'expired') {
+        skippedCount++;
+        console.log(`Skipping membership ${membership.id} with status: ${status}`);
+        continue;
+      }
+
       try {
         // Cancel the membership immediately
         await client.memberships.cancel(membership.id, {
           cancellation_mode: 'immediate',
         });
         canceled = true;
-      } catch (error) {
-        console.error(`Error canceling membership ${membership.id}:`, error);
+        canceledCount++;
+        console.log(`Successfully canceled membership ${membership.id} (status: ${membership.status})`);
+      } catch (error: any) {
+        errorCount++;
+        // Extract detailed error information
+        const errorMessage = error.message || error.response?.data?.message || String(error);
+        const errorStatus = error.status || error.response?.status;
+        const errorData = error.response?.data;
+        
+        console.error(`Error canceling membership ${membership.id} (status: ${membership.status}):`, {
+          message: errorMessage,
+          status: errorStatus,
+          data: errorData,
+        });
+        
+        // If it's a 404 or 400, the membership might already be canceled or not exist
+        // Continue trying to cancel other memberships
       }
     }
 
-    return canceled;
-  } catch (error) {
-    console.error('Error banning user:', error);
+    console.log(`Ban attempt summary: ${totalMemberships} memberships found, ${canceledCount} canceled, ${skippedCount} skipped, ${errorCount} errors`);
+
+    // Return true if at least one membership was successfully canceled
+    // OR if user has memberships but they're all already completed/canceled (user is effectively banned)
+    if (canceled) {
+      return true;
+    } else if (totalMemberships > 0 && skippedCount === totalMemberships) {
+      // All memberships are already completed/canceled, user is effectively banned
+      console.log('User has no active memberships - already effectively banned');
+      return true;
+    }
+    
+    return false;
+  } catch (error: any) {
+    console.error('Error banning user:', error.message || error);
     return false;
   }
 }

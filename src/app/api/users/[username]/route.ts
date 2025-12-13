@@ -29,6 +29,14 @@ export async function GET(
                 status?: string;
                 accessLevel?: string;
             } | null = null;
+            let memberships: Array<{
+                id: string;
+                productTitle: string;
+                planId: string;
+                status: string;
+                createdAt: string;
+                currency: string | null;
+            }> = [];
 
             // Strategy 1: If we have companyId, try to get member info first (more efficient, includes email)
             // This gives us both user info and member-specific data in one call
@@ -120,6 +128,30 @@ export async function GET(
                 }
             }
 
+            // Fetch memberships if we have companyId and userData
+            if (companyId && userData?.id) {
+                try {
+                    const membershipList = client.memberships.list({
+                        company_id: companyId,
+                        user_ids: [userData.id],
+                        first: 50, // Get up to 50 memberships
+                    });
+
+                    for await (const membership of membershipList) {
+                        memberships.push({
+                            id: membership.id,
+                            productTitle: membership.product?.title || 'Unknown Product',
+                            planId: membership.plan?.id || 'N/A',
+                            status: membership.status || 'unknown',
+                            createdAt: membership.created_at,
+                            currency: membership.currency || null,
+                        });
+                    }
+                } catch (membershipError) {
+                    console.warn('Could not fetch memberships:', membershipError);
+                }
+            }
+
             return NextResponse.json({
                 id: userData.id,
                 username: userData.username,
@@ -139,6 +171,8 @@ export async function GET(
                     memberStatus: memberInfo.status,
                     accessLevel: memberInfo.accessLevel,
                 }),
+                // Membership information
+                memberships: memberships,
             });
         } catch (error: any) {
             if (error.status === 404) {

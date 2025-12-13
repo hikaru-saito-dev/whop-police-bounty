@@ -53,31 +53,36 @@ export async function PATCH(
 
     // Update report status
     if (action === 'approve') {
-      // Ban the user using Whop SDK
+      // Ban the user using Whop SDK - must be successful before approving
       const client = getWhopClient();
 
-      // First, try to find the user by username
       try {
+        // First, try to find the user by username
         const reportedUser = await client.users.retrieve(report.reportedUsername.replace('@', ''));
         const banned = await banUserFromCompany(reportedUser.id, companyId);
 
         if (!banned) {
           console.warn(`Could not ban user ${reportedUser.id} - they may not be a member`);
-          return NextResponse.json({ error: 'Could not ban user' }, { status: 400 });
+          return NextResponse.json({ 
+            error: 'Could not ban user - user may not be a member of this company' 
+          }, { status: 400 });
         }
-      } catch (error) {
+
+        // Only approve the report if ban was successful
+        const updatedReport = await updateReportStatus(
+          id,
+          companyId,
+          'approved',
+          userId
+        );
+
+        return NextResponse.json({ report: updatedReport });
+      } catch (error: any) {
         console.error('Error banning user:', error);
-        // Continue with approval even if ban fails
+        return NextResponse.json({ 
+          error: error.message || 'Could not ban user' 
+        }, { status: 400 });
       }
-
-      const updatedReport = await updateReportStatus(
-        id,
-        companyId,
-        'approved',
-        userId
-      );
-
-      return NextResponse.json({ report: updatedReport });
     } else {
       const updatedReport = await updateReportStatus(
         id,

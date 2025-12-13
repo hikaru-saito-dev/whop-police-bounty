@@ -16,6 +16,15 @@ import {
 import { Close, ContentCopy, CheckCircle } from '@mui/icons-material';
 import { useAccess } from './AccessProvider';
 
+interface Membership {
+  id: string;
+  productTitle: string;
+  planId: string;
+  status: string;
+  createdAt: string;
+  currency: string | null;
+}
+
 interface UserInfo {
   id: string;
   username: string;
@@ -27,7 +36,9 @@ interface UserInfo {
   location: string | null;
   discordId: string | null;
   discord: string | null;
-  joinedAt: string;
+  joinedAt?: string;
+  totalSpent?: number;
+  memberships?: Membership[];
 }
 
 interface UserInfoModalProps {
@@ -203,7 +214,7 @@ export default function UserInfoModal({ open, onClose, username }: UserInfoModal
                 {userInfo.name || userInfo.username}
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-                @{userInfo.username}
+                {userInfo.username}
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
                 Created: {formatDate(userInfo.createdAt)}
@@ -215,6 +226,68 @@ export default function UserInfoModal({ open, onClose, username }: UserInfoModal
                   </Typography>
                 )
               }
+
+              <Divider sx={{ my: 3 }} />
+
+              {/* Membership Information */}
+              {userInfo.memberships && userInfo.memberships.length > 0 && (
+                <>
+                  <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                    Memberships ({userInfo.memberships.length})
+                  </Typography>
+                  <Paper elevation={0} sx={{ bgcolor: 'background.default', p: 2, borderRadius: 1, mb: 3 }}>
+                    {userInfo.memberships.map((membership, index) => (
+                      <Box key={membership.id} sx={{ mb: index < userInfo.memberships!.length - 1 ? 2 : 0, pb: index < userInfo.memberships!.length - 1 ? 2 : 0, borderBottom: index < userInfo.memberships!.length - 1 ? 1 : 0, borderColor: 'divider' }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                          <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                            {membership.productTitle}
+                          </Typography>
+                          <Typography 
+                            variant="caption" 
+                            sx={{ 
+                              px: 1, 
+                              py: 0.5, 
+                              borderRadius: 1, 
+                              bgcolor: membership.status === 'active' ? 'success.main' : 
+                                       membership.status === 'completed' ? 'info.main' :
+                                       membership.status === 'canceled' ? 'error.main' : 'grey.700',
+                              color: 'white',
+                              textTransform: 'capitalize',
+                            }}
+                          >
+                            {membership.status}
+                          </Typography>
+                        </Box>
+                        <Typography variant="caption" color="text.secondary">
+                          Plan ID: {membership.planId}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.5 }}>
+                          Created: {formatDate(membership.createdAt)}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Paper>
+                </>
+              )}
+
+              {/* Total Spending */}
+              {userInfo.totalSpent !== undefined && userInfo.totalSpent !== null && (
+                <>
+                  <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                    Spending
+                  </Typography>
+                  <Paper elevation={0} sx={{ bgcolor: 'background.default', p: 2, borderRadius: 1, mb: 3 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Typography variant="body2" color="text.secondary">
+                        Total Spent:
+                      </Typography>
+                      <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main' }}>
+                        ${userInfo.totalSpent.toFixed(2)} USD
+                      </Typography>
+                    </Box>
+                  </Paper>
+                </>
+              )}
 
               <Divider sx={{ my: 3 }} />
 

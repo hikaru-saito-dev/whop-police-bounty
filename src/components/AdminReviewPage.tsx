@@ -190,7 +190,7 @@ export default function AdminReviewPage({ companyId }: AdminReviewPageProps) {
                           setUserModalOpen(true);
                         }}
                       >
-                        @{report.reportedUsername}
+                        {report.reportedUsername}
                       </Typography>
                       <Chip
                         label={report.status}
@@ -211,7 +211,7 @@ export default function AdminReviewPage({ companyId }: AdminReviewPageProps) {
                           setUserModalOpen(true);
                         }}
                       >
-                        @{report.reporterUsername}
+                        {report.reporterUsername}
                       </Typography>
                     </Typography>
                     <Typography variant="body1" sx={{ mb: 2 }}>
@@ -288,7 +288,7 @@ export default function AdminReviewPage({ companyId }: AdminReviewPageProps) {
                           setUserModalOpen(true);
                         }}
                       >
-                        @{report.reportedUsername}
+                        {report.reportedUsername}
                       </Typography>
                       <Chip
                         label={report.status}
@@ -309,7 +309,7 @@ export default function AdminReviewPage({ companyId }: AdminReviewPageProps) {
                           setUserModalOpen(true);
                         }}
                       >
-                        @{report.reporterUsername}
+                        {report.reporterUsername}
                       </Typography>
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
@@ -327,7 +327,7 @@ export default function AdminReviewPage({ companyId }: AdminReviewPageProps) {
         <DialogTitle>Confirm Ban</DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to approve this report and ban @{selectedReport?.reportedUsername}?
+            Are you sure you want to approve this report and ban {selectedReport?.reportedUsername}?
             This action cannot be undone.
           </Typography>
         </DialogContent>
