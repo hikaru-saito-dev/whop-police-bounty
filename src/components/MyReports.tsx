@@ -138,18 +138,19 @@ export default function MyReports({ companyId }: MyReportsProps) {
         View the status of reports you've submitted
       </Typography>
 
-      <Grid container spacing={3}>
+      <Grid container spacing={2}>
         {reports.map((report) => (
-          <Grid size={{ xs: 12 }} key={report._id}>
-            <Card elevation={2}>
-              <CardContent>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                  <Box>
+          <Grid size={{ xs: 12, md: 6 }} key={report._id}>
+            <Card elevation={1} sx={{ height: '100%' }}>
+              <CardContent sx={{ p: 2 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
+                  <Box sx={{ flex: 1 }}>
                     <Typography
-                      variant="h6"
+                      variant="subtitle1"
                       sx={{
-                        mb: 1,
+                        mb: 0.5,
                         cursor: 'pointer',
+                        fontWeight: 600,
                         '&:hover': { textDecoration: 'underline', color: 'primary.main' },
                       }}
                       onClick={() => {
@@ -157,55 +158,43 @@ export default function MyReports({ companyId }: MyReportsProps) {
                         setUserModalOpen(true);
                       }}
                     >
-                      Reported: @{report.reportedUsername}
+                      Reported: {report.reportedUsername}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="caption" color="text.secondary">
                       Submitted: {formatDate(report.createdAt)}
                     </Typography>
                   </Box>
                   {getStatusChip(report.status)}
                 </Box>
 
-                <Typography variant="body1" sx={{ mb: 2, whiteSpace: 'pre-wrap' }}>
+                <Typography variant="body2" sx={{ mb: 1.5, whiteSpace: 'pre-wrap' }}>
                   {report.description}
                 </Typography>
 
                 {report.proofImageUrl && (
-                  <Paper
-                    elevation={1}
+                  <Box
                     sx={{
-                      position: 'relative',
-                      display: 'inline-block',
-                      p: 1,
-                      mb: 2,
+                      mb: 1.5,
+                      borderRadius: 1,
+                      overflow: 'hidden',
                       maxWidth: '100%',
                     }}
                   >
-                    <Box
-                      sx={{
+                    <img
+                      src={report.proofImageUrl}
+                      alt="Proof"
+                      style={{
                         width: '100%',
-                        maxWidth: 300,
-                        height: 200,
-                        position: 'relative',
-                        borderRadius: 1,
-                        overflow: 'hidden',
+                        maxHeight: 150,
+                        objectFit: 'cover',
+                        display: 'block',
                       }}
-                    >
-                      <img
-                        src={report.proofImageUrl}
-                        alt="Proof"
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
-                        }}
-                      />
-                    </Box>
-                  </Paper>
+                    />
+                  </Box>
                 )}
 
                 {report.reviewedAt && (
-                  <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+                  <Typography variant="caption" color="text.secondary">
                     Reviewed: {formatDate(report.reviewedAt)}
                     {report.reviewedBy && ` by ${report.reviewedBy}`}
                   </Typography>

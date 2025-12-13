@@ -15,6 +15,7 @@ A Next.js application for reporting scammers on the Whop platform. Built with Ma
 - Node.js 20+ 
 - MongoDB (local or Atlas)
 - Whop API Key and App ID
+- Cloudinary account (for image uploads)
 
 ## Setup
 
@@ -29,7 +30,15 @@ A Next.js application for reporting scammers on the Whop platform. Built with Ma
    WHOP_API_KEY=your_whop_api_key_here
    NEXT_PUBLIC_WHOP_APP_ID=your_whop_app_id_here
    MONGODB_URI=mongodb://localhost:27017/whop-bounty
+   CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+   CLOUDINARY_API_KEY=your_cloudinary_api_key
+   CLOUDINARY_API_SECRET=your_cloudinary_api_secret
    ```
+   
+   **Getting Cloudinary credentials:**
+   1. Sign up at [cloudinary.com](https://cloudinary.com)
+   2. Go to your Dashboard
+   3. Copy your Cloud Name, API Key, and API Secret
 
 3. **Run the development server:**
    ```bash
@@ -62,7 +71,7 @@ A Next.js application for reporting scammers on the Whop platform. Built with Ma
 - `POST /api/reports` - Submit a new report
 - `GET /api/reports?company_id=xxx` - Get all reports (team members only)
 - `PATCH /api/reports/[id]` - Approve or deny a report (team members only)
-- `POST /api/upload` - Upload proof images
+- `POST /api/upload` - Upload proof images to Cloudinary
 
 ## Technologies
 
@@ -77,8 +86,11 @@ A Next.js application for reporting scammers on the Whop platform. Built with Ma
 | Variable | Description | Required |
 |----------|-------------|----------|
 | `WHOP_API_KEY` | Your Whop API key | Yes |
-| `WHOP_APP_ID` | Your Whop App ID (for user token verification) | Optional |
+| `NEXT_PUBLIC_WHOP_APP_ID` | Your Whop App ID (for user token verification) | Optional |
 | `MONGODB_URI` | MongoDB connection string | Yes |
+| `CLOUDINARY_CLOUD_NAME` | Your Cloudinary cloud name | Yes |
+| `CLOUDINARY_API_KEY` | Your Cloudinary API key | Yes |
+| `CLOUDINARY_API_SECRET` | Your Cloudinary API secret | Yes |
 
 ## License
 

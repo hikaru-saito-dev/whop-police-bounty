@@ -64,9 +64,11 @@ export default function ReportForm({ companyId }: ReportFormProps) {
     setErrorMessage('');
 
     try {
-      // Upload image first
+      // Upload image first if we have a file to upload
       let imageUrl = proofImageUrl;
-      if (proofImage && !proofImageUrl?.startsWith('data:')) {
+      if (proofImage) {
+        // If we have a file, always upload it to Cloudinary
+        // (proofImageUrl might be a data URL preview, or might be empty)
         const formData = new FormData();
         formData.append('file', proofImage);
         const uploadResponse = await fetch('/api/upload', {
@@ -74,7 +76,8 @@ export default function ReportForm({ companyId }: ReportFormProps) {
           body: formData,
         });
         if (!uploadResponse.ok) {
-          throw new Error('Failed to upload image');
+          const errorData = await uploadResponse.json().catch(() => ({}));
+          throw new Error(errorData.error || 'Failed to upload image');
         }
         const uploadData = await uploadResponse.json();
         imageUrl = uploadData.url;

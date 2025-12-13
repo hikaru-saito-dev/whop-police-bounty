@@ -55,14 +55,15 @@ export async function PATCH(
     if (action === 'approve') {
       // Ban the user using Whop SDK
       const client = getWhopClient();
-      
+
       // First, try to find the user by username
       try {
         const reportedUser = await client.users.retrieve(report.reportedUsername.replace('@', ''));
         const banned = await banUserFromCompany(reportedUser.id, companyId);
-        
+
         if (!banned) {
           console.warn(`Could not ban user ${reportedUser.id} - they may not be a member`);
+          return NextResponse.json({ error: 'Could not ban user' }, { status: 400 });
         }
       } catch (error) {
         console.error('Error banning user:', error);
