@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Box, Container, AppBar, Toolbar, Typography, Button, Tabs, Tab } from '@mui/material';
+import { Box, Container, AppBar, Toolbar, Typography, Tabs, Tab } from '@mui/material';
 import { Report, AdminPanelSettings, History } from '@mui/icons-material';
 import Image from 'next/image';
 import { useTheme } from 'next-themes';
@@ -16,7 +16,7 @@ function HomeContent() {
   const experienceId = searchParams?.get('experience') || null;
   const { isAuthorized, loading, role, companyId } = useAccess();
   const [tabValue, setTabValue] = useState(0);
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme } = useTheme();
 
   // Set experienceId in AccessProvider when it's available from page.tsx
   useEffect(() => {
@@ -61,7 +61,7 @@ function HomeContent() {
             Missing company_id
           </Typography>
           <Typography variant="body1" sx={{ mt: 2 }}>
-            Please provide a company_id in the URL query parameters or ensure you're accessing through a Whop experience.
+            Please provide a company_id in the URL query parameters or ensure you&apos;re accessing through a Whop experience.
           </Typography>
         </Box>
       </Container>
@@ -74,7 +74,7 @@ function HomeContent() {
         <Toolbar>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexGrow: 1 }}>
             <Image
-              src={theme === 'dark' ? '/whop-assets/logos/whop-logo-white.png' : '/whop-assets/logos/whop-logo.png'}
+              src={resolvedTheme === 'dark' ? '/whop-assets/logos/whop-logo-white.png' : '/whop-assets/logos/whop-logo.png'}
               alt="Whop Logo"
               width={32}
               height={32}
@@ -84,13 +84,6 @@ function HomeContent() {
               Whop Bounty
             </Typography>
           </Box>
-          <Button
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            variant="outlined"
-            size="small"
-          >
-            {theme === 'dark' ? '☀️' : '🌙'}
-          </Button>
         </Toolbar>
       </AppBar>
 

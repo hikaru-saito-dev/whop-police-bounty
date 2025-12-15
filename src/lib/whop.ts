@@ -235,12 +235,13 @@ export async function banUserFromCompany(
     for await (const membership of memberships) {
       totalMemberships++;
       
-      // Skip memberships that are already completed or canceled
+      // Skip memberships that are already completed, canceled, expired, or drafted
       // Only cancel active memberships (status: 'active', 'trialing', etc.)
+      // Drafted memberships can't be canceled as they're not active yet
       const status = membership.status?.toLowerCase();
-      if (status === 'completed' || status === 'canceled' || status === 'expired') {
+      if (status === 'completed' || status === 'canceled' || status === 'expired' || status === 'drafted') {
         skippedCount++;
-        console.log(`Skipping membership ${membership.id} with status: ${status}`);
+        console.log(`Skipping membership ${membership.id} with status: ${status} (not cancelable)`);
         continue;
       }
 
@@ -252,21 +253,8 @@ export async function banUserFromCompany(
         canceled = true;
         canceledCount++;
         console.log(`Successfully canceled membership ${membership.id} (status: ${membership.status})`);
-      } catch (error: any) {
+      } catch {
         errorCount++;
-        // Extract detailed error information
-        const errorMessage = error.message || error.response?.data?.message || String(error);
-        const errorStatus = error.status || error.response?.status;
-        const errorData = error.response?.data;
-        
-        console.error(`Error canceling membership ${membership.id} (status: ${membership.status}):`, {
-          message: errorMessage,
-          status: errorStatus,
-          data: errorData,
-        });
-        
-        // If it's a 404 or 400, the membership might already be canceled or not exist
-        // Continue trying to cancel other memberships
       }
     }
 
@@ -283,8 +271,8 @@ export async function banUserFromCompany(
     }
     
     return false;
-  } catch (error: any) {
-    console.error('Error banning user:', error.message || error);
+  } catch {
+    console.error('Error banning user');
     return false;
   }
 }
