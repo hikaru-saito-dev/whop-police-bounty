@@ -2,10 +2,9 @@
 
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Box, Container, AppBar, Toolbar, Typography, Tabs, Tab } from '@mui/material';
+import { Box, Container, AppBar, Toolbar, Typography, Tabs, Tab, useTheme } from '@mui/material';
 import { Report, AdminPanelSettings, History } from '@mui/icons-material';
 import Image from 'next/image';
-import { useTheme } from 'next-themes';
 import { useAccess, setExperienceId } from '@/components/AccessProvider';
 import ReportForm from '@/components/ReportForm';
 import AdminReviewPage from '@/components/AdminReviewPage';
@@ -16,7 +15,8 @@ function HomeContent() {
   const experienceId = searchParams?.get('experience') || null;
   const { isAuthorized, loading, role, companyId } = useAccess();
   const [tabValue, setTabValue] = useState(0);
-  const { resolvedTheme } = useTheme();
+  const theme = useTheme();
+  const isDarkMode = theme.palette.mode === 'dark';
 
   // Set experienceId in AccessProvider when it's available from page.tsx
   useEffect(() => {
@@ -74,7 +74,7 @@ function HomeContent() {
         <Toolbar>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexGrow: 1 }}>
             <Image
-              src={resolvedTheme === 'dark' ? '/whop-assets/logos/whop-logo-white.png' : '/whop-assets/logos/whop-logo.png'}
+              src={isDarkMode ? '/whop-assets/logos/whop-logo-white.png' : '/whop-assets/logos/whop-logo.png'}
               alt="Whop Logo"
               width={32}
               height={32}

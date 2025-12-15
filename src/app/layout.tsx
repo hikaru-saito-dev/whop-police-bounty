@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { ThemeProvider } from "next-themes";
 import ThemeRegistry from "@/components/ThemeRegistry";
 import { AccessProvider } from "@/components/AccessProvider";
 import "./globals.css";
@@ -32,13 +31,11 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <ThemeRegistry>
-            <AccessProvider>
-              {children}
-            </AccessProvider>
-          </ThemeRegistry>
-        </ThemeProvider>
+        <ThemeRegistry>
+          <AccessProvider>
+            {children}
+          </AccessProvider>
+        </ThemeRegistry>
       </body>
     </html>
   );

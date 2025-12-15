@@ -1,8 +1,7 @@
 'use client';
 
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { useTheme as useNextTheme } from 'next-themes';
-import { useEffect, useState } from 'react';
+import { createTheme, ThemeProvider, useMediaQuery, PaletteMode } from '@mui/material/styles';
+import { useEffect, useMemo, useState } from 'react';
 
 // Whop brand colors from https://brand.whop.com/
 const dragonFire = '#FA4616'; // Primary orange - Dragon Fire
@@ -189,18 +188,14 @@ const darkTheme = createTheme({
 });
 
 export function WhopThemeProvider({ children }: { children: React.ReactNode }) {
-  const { theme: nextTheme, resolvedTheme } = useNextTheme();
-  const [mounted, setMounted] = useState(false);
+  const systemPrefersDark = useMediaQuery('(prefers-color-scheme: dark)', { noSsr: true });
+  const [mode, setMode] = useState<PaletteMode>(systemPrefersDark ? 'dark' : 'light');
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    setMode(systemPrefersDark ? 'dark' : 'light');
+  }, [systemPrefersDark]);
 
-  const theme = resolvedTheme === 'dark' ? darkTheme : lightTheme;
-
-  if (!mounted) {
-    return <>{children}</>;
-  }
+  const theme = useMemo(() => (mode === 'dark' ? darkTheme : lightTheme), [mode]);
 
   return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
 }
